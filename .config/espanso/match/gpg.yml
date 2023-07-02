@@ -1,0 +1,52 @@
+global_vars:
+
+    - name: "gpg_key_id"
+      type: "shell"
+      params:
+          cmd: "[[ $GPGKEY = '' ]] && echo '8304425CA8C30F38' || echo $GPGKEY"
+
+    - name: "gpg_fingerprint"
+      type: "echo"
+      params:
+          echo: "7AC486F4E9E483EFBD8072298304425CA8C30F38"
+
+matches:
+
+    - triggers:
+        - ";gpg id"
+        - ";gpg key"
+      replace: "{{gpg_key_id}}"
+      
+    - triggers:
+        - ";gpg fp"
+        - ";gpg fingerprint"
+      replace: "{{gpg_fingerprint}}"
+
+    - trigger: ";gpg show"
+      replace: "gpg --list-secret-keys --keyid-format=long --with-keygrip --with-subkey-fingerprints -vvv"
+
+    - trigger: ";gpg edit"
+      replace: "gpg -vvv --edit-key {{gpg_key_id}}"
+
+    - trigger: ";gpg encrypt"
+      form: "gpg --output [[target]] --symmetric --no-symkey-cache [[source]]"
+      form_fields:
+          target:
+              default: "?"
+          source:
+              default: "?"
+
+    - trigger: ";gpg decrypt"
+      replace: "gpg --output [[target]] --decrypt --no-symkey-cache [[source]]"
+      form_fields:
+          target:
+              default: "?"
+          source:
+              default: "?"
+
+    - trigger: ";gpg ssh"
+      replace: "gpg -vvv --export-ssh-key {{gpg_key_id}}"
+
+    - trigger: ";gpg publish"
+      replace: "gpg --auto-key-locate --send-keys --armor keyserver -vvv {{gpg_key_id}}"
+
