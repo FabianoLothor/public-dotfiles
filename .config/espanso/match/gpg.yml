@@ -8,7 +8,7 @@ global_vars:
     - name: "gpg_key_id"
       type: "shell"
       params:
-        cmd: '[[ $GPGKEY = "" ]] && echo $({{gpg_show_command}} | grep sec | grep -Eo "\/(\w+)" | grep -Eo "\w+") || echo $GPGKEY'
+        cmd: '[[ $GPGKEY = "" ]] && echo $({{gpg_show_command}} | grep sec | grep -Eo "\/\w+" | grep -Eo "\w+") || echo $GPGKEY'
 
     - name: "gpg_fingerprint"
       type: "shell"
@@ -37,17 +37,17 @@ matches:
       form: "gpg --output [[target]] --symmetric --no-symkey-cache [[source]]"
       form_fields:
         target:
-            default: "?"
+            default: "[[target]]"
         source:
-            default: "?"
+            default: "[[source]]"
 
     - trigger: ";gpg decrypt"
       replace: "gpg --output [[target]] --decrypt --no-symkey-cache [[source]]"
       form_fields:
         target:
-            default: "?"
+            default: "[[target]]"
         source:
-            default: "?"
+            default: "[[source]]"
 
     - trigger: ";gpg ssh"
       replace: "gpg --export-ssh-key {{gpg_key_id}}"
