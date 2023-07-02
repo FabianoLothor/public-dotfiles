@@ -1,14 +1,19 @@
 global_vars:
 
+    - name: gpg_show_command
+      type: echo
+      params:
+        echo: gpg --list-secret-keys --keyid-format=long --with-keygrip --with-subkey-fingerprints
+
     - name: "gpg_key_id"
       type: "shell"
       params:
-          cmd: "[[ $GPGKEY = '' ]] && echo '8304425CA8C30F38' || echo $GPGKEY"
+        cmd: '[[ $GPGKEY = "" ]] && echo $({{gpg_show_command}} | grep sec | grep -Eo "\/(\w+)" | grep -Eo "\w+") || echo $GPGKEY'
 
     - name: "gpg_fingerprint"
-      type: "echo"
+      type: "shell"
       params:
-          echo: "7AC486F4E9E483EFBD8072298304425CA8C30F38"
+        cmd: '[[ $GPGKEY = "" ]] && echo $({{gpg_show_command}} | grep sec -A 1 | grep -Eo "\w+$") || echo $GPGKEY'
 
 matches:
 
@@ -23,30 +28,30 @@ matches:
       replace: "{{gpg_fingerprint}}"
 
     - trigger: ";gpg show"
-      replace: "gpg --list-secret-keys --keyid-format=long --with-keygrip --with-subkey-fingerprints -vvv"
+      replace: "{{gpg_show_command}}"
 
     - trigger: ";gpg edit"
-      replace: "gpg -vvv --edit-key {{gpg_key_id}}"
+      replace: "gpg --edit-key {{gpg_key_id}}"
 
     - trigger: ";gpg encrypt"
       form: "gpg --output [[target]] --symmetric --no-symkey-cache [[source]]"
       form_fields:
-          target:
-              default: "?"
-          source:
-              default: "?"
+        target:
+            default: "?"
+        source:
+            default: "?"
 
     - trigger: ";gpg decrypt"
       replace: "gpg --output [[target]] --decrypt --no-symkey-cache [[source]]"
       form_fields:
-          target:
-              default: "?"
-          source:
-              default: "?"
+        target:
+            default: "?"
+        source:
+            default: "?"
 
     - trigger: ";gpg ssh"
-      replace: "gpg -vvv --export-ssh-key {{gpg_key_id}}"
+      replace: "gpg --export-ssh-key {{gpg_key_id}}"
 
     - trigger: ";gpg publish"
-      replace: "gpg --auto-key-locate --send-keys --armor keyserver -vvv {{gpg_key_id}}"
+      replace: "gpg --auto-key-locate --send-keys --armor keyserver {{gpg_key_id}}"
 
