@@ -1,0 +1,4 @@
+filter_class: "firefox"
+backspace_delay: 5
+inject_delay: 5
+
