@@ -6,8 +6,6 @@ export GPGKEY=8304425CA8C30F38
 
 # > setup gpg-agent to manage ssh
 
-gpg-agent --daemon
-
 unset SSH_AGENT_PID
 
 if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
