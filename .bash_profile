@@ -20,8 +20,3 @@ gpg-connect-agent updatestartuptty /bye > /dev/null
 
 # < setup gpg-agent to manage ssh
 
-# > reload ~/.bashrc
-
-. ~/.bashrc
-
-# < reload ~/.bashrc
